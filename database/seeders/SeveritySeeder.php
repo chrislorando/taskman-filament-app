@@ -29,12 +29,6 @@ class SeveritySeeder extends Seeder
         ]);
 
         Severity::create([
-            'name' => 'Critical',
-            'color' => SeverityColor::Danger->value,
-            'sort_order' => 4,
-        ]);
-
-        Severity::create([
             'name' => 'Info',
             'color' => SeverityColor::Info->value,
             'sort_order' => 5,

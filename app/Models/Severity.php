@@ -16,6 +16,10 @@ class Severity extends Model
         'sort_order',
     ];
 
+    protected $casts = [
+        'color' => \App\Enums\SeverityColor::class,
+    ];
+
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
