@@ -25,13 +25,13 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('/')
             ->login()
             ->colors([
                 'primary' => Color::Blue,
             ])
             ->spa()
-            ->databaseNotifications()
+            // ->databaseNotifications()
             ->databaseTransactions()
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('3rem')
