@@ -1,0 +1,45 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Severity;
+use App\Models\Status;
+use App\Models\Task;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class TaskFactory extends Factory
+{
+    protected $model = Task::class;
+
+    public function definition(): array
+    {
+        $status = Status::inRandomOrder()->first() ?? Status::create([
+            'name' => fake()->unique()->word(),
+            'is_active' => true,
+            'sort_order' => fake()->numberBetween(0, 100),
+        ]);
+
+        $severity = Severity::inRandomOrder()->first() ?? Severity::create([
+            'name' => fake()->unique()->word(),
+            'color' => fake()->hexColor(),
+            'sort_order' => fake()->numberBetween(0, 100),
+        ]);
+
+        $developer = User::inRandomOrder()->first() ?? User::factory()->create([
+            'role' => 'developer',
+        ]);
+
+        return [
+            'title' => fake()->sentence(),
+            'description' => fake()->text(),
+            'status_id' => $status->id,
+            'severity_id' => $severity->id,
+            'developer_id' => $developer->id,
+            'start_date' => fake()->date(),
+            'due_date' => fake()->date(),
+            'finish_date' => fake()->optional(0.3)->date(),
+            'created_by' => $developer->id,
+        ];
+    }
+}
