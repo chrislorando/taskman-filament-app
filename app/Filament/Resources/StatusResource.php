@@ -7,6 +7,7 @@ use App\Models\Status;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -19,6 +20,7 @@ class StatusResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(1)
             ->schema([
                 Forms\Components\TextInput::make('sort_order')
                     ->required()
@@ -61,7 +63,7 @@ class StatusResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->modalWidth(MaxWidth::Large),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
