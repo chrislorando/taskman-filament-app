@@ -32,13 +32,13 @@ class TaskFactory extends Factory
 
         return [
             'title' => fake()->sentence(),
-            'description' => fake()->text(),
+            'description' => fake()->paragraphs(5, true),
             'status_id' => $status->id,
             'severity_id' => $severity->id,
             'developer_id' => $developer->id,
             'start_date' => fake()->date(),
             'due_date' => fake()->date(),
-            'finish_date' => fake()->optional(0.3)->date(),
+            'finish_date' => null,
             'created_by' => $developer->id,
         ];
     }
