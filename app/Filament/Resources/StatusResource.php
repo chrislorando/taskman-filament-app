@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\StatusColor;
 use App\Filament\Resources\StatusResource\Pages;
 use App\Models\Status;
 use Filament\Forms;
@@ -35,6 +36,9 @@ class StatusResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->unique(),
+                Forms\Components\ToggleButtons::make('color')
+                    ->options(StatusColor::class)
+                    ->inline(),
                 Forms\Components\Toggle::make('is_active')
                     ->required()
                     ->columnSpanFull(),
@@ -51,7 +55,9 @@ class StatusResource extends Resource
                     ->sortable()
                     ->width(100),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->badge()
+                    ->color(fn ($record) => $record->color->value),
                 Tables\Columns\IconColumn::make('is_active')
                     ->alignCenter()
                     ->boolean(),

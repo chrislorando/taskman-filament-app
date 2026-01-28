@@ -124,7 +124,9 @@ class TaskResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status.name')
                     ->badge()
-                    ->numeric()
+                    ->color(function ($record) {
+                        return $record->status->color->value;
+                    })
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('developer.name')
@@ -184,7 +186,7 @@ class TaskResource extends Resource
                             TextEntry::make('status.name')
                                 ->badge()
                                 ->inlineLabel()
-                                ->color('primary'),
+                                ->color(fn ($record) => $record->status->color->value),
                             TextEntry::make('severity.name')
                                 ->badge()
                                 ->inlineLabel()

@@ -30,6 +30,10 @@ class ListTasks extends ListRecords
 
         foreach ($statuses as $status) {
             $tabs[str($status->name)->slug()->toString()] = Tab::make($status->name)
+                ->badge(function () use ($status) {
+                    return \App\Models\Task::where('status_id', $status->id)->count();
+                })
+                ->badgeColor($status->color->value)
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('status_id', $status->id));
         }
 
