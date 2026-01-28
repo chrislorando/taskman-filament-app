@@ -26,33 +26,63 @@ class TaskResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $isDeveloper = auth()->check() && auth()->user()->role === \App\Enums\UserRole::Developer;
+
         return $form
             ->schema([
                 Section::make('Task Information')
-                    ->columnSpan(8)
+                    // ->columnSpan(8)
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->required()
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->disabled($isDeveloper),
                         Forms\Components\Select::make('status_id')
                             ->relationship('status', 'name')
                             ->native(false)
-                            ->required(),
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(function (Forms\Set $set, $state) {
+                                $completedStatus = \App\Models\Status::where('name', 'Completed')->first();
+
+                                if ($state == $completedStatus?->id) {
+                                    $set('finish_date', now()->toDateString());
+                                } else {
+                                    $set('finish_date', null);
+                                }
+                            })
+                            ->options(function () use ($isDeveloper) {
+                                if ($isDeveloper) {
+                                    return \App\Models\Status::whereIn('name', ['In Progress', 'Completed'])
+                                        ->pluck('name', 'id');
+                                }
+
+                                return \App\Models\Status::all()->pluck('name', 'id');
+                            })
+                            ->helperText(function () use ($isDeveloper) {
+                                if ($isDeveloper) {
+                                    return 'You can only change status to In Progress or Completed';
+                                }
+
+                                return null;
+                            }),
                         Forms\Components\Select::make('severity_id')
                             ->relationship('severity', 'name')
                             ->native(false)
-                            ->required(),
+                            ->required()
+                            ->disabled($isDeveloper),
                         Forms\Components\MarkdownEditor::make('description')
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->disabled($isDeveloper),
                     ]),
                 Section::make('Task Details')
-                    ->columnSpan([
-                        'default' => 1,
-                        'md' => 4,
-                    ])
+                    // ->columnSpan([
+                    //     'default' => 1,
+                    //     'md' => 4,
+                    // ])
+                    ->columns(2)
                     ->schema([
-
                         Forms\Components\Select::make('developer_id')
                             ->label('Assigned to')
                             ->relationship('developer', 'name')
@@ -61,9 +91,13 @@ class TaskResource extends Resource
                             ->native(false)
                             ->required()
                             ->visible(fn () => auth()->check() && auth()->user()?->role === \App\Enums\UserRole::Admin),
-                        Forms\Components\DatePicker::make('start_date'),
-                        Forms\Components\DatePicker::make('due_date'),
-                        Forms\Components\DatePicker::make('finish_date'),
+                        Forms\Components\DatePicker::make('start_date')
+                            ->disabled($isDeveloper),
+                        Forms\Components\DatePicker::make('due_date')
+                            ->disabled($isDeveloper),
+                        Forms\Components\DatePicker::make('finish_date')
+                            ->helperText('Automatically filled when status is Completed')
+                            ->readOnly($isDeveloper),
                     ]),
             ])->columns(12);
     }
@@ -87,6 +121,7 @@ class TaskResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status.name')
+                    ->badge()
                     ->numeric()
                     ->sortable(),
 
@@ -135,11 +170,12 @@ class TaskResource extends Resource
         return $infolist
             ->schema([
                 InfolistSection::make('Task Information')
-                    ->columnSpan(8)
+                    // ->columnSpan(8)
+                    ->heading(function($record){
+                        return $record->title;
+                    })
                     ->schema([
                         Grid::make()->schema([
-                            TextEntry::make('title')
-                                ->columnSpanFull(),
                             TextEntry::make('status.name')
                                 ->badge()
                                 ->color('primary'),
@@ -155,8 +191,9 @@ class TaskResource extends Resource
                                 ->columnSpanFull(),
                         ]),
                     ]),
-                InfolistSection::make('Task Details')
-                    ->columnSpan(4)
+                InfolistSection::make('Details')
+                    ->columns(2)
+                    // ->columnSpan(4)
                     ->schema([
 
                         TextEntry::make('developer.name')
@@ -169,7 +206,8 @@ class TaskResource extends Resource
                             ->date()
                             ->placeholder('Not finished'),
                     ]),
-            ])->columns(12);
+            ]);
+            // ->columns(12);
     }
 
     public static function getRelations(): array
