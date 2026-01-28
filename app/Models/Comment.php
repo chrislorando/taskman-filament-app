@@ -37,4 +37,15 @@ class Comment extends Model
     {
         return $this->hasMany(Comment::class, 'parent_id');
     }
+
+    public function getLevel(): int
+    {
+        $level = 0;
+        $parent = $this->parent;
+        while ($parent) {
+            $level++;
+            $parent = $parent->parent;
+        }
+        return $level;
+    }
 }

@@ -2,9 +2,16 @@
 
 namespace App\Filament\Resources\TaskResource\RelationManagers;
 
+use App\Models\Comment;
+use App\Models\Task;
+use Filament\Actions\ActionGroup;
 use Filament\Forms;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Table;
@@ -25,21 +32,15 @@ class CommentsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
+        $table->modifyQueryUsing(function ($query) {
+            $query->orderByRaw('COALESCE(parent_id, id), parent_id IS NOT NULL, id');
+        });
         return $table
             // ->recordTitleAttribute('body')
+            ->striped()
             ->columns([
                 Stack::make([
-                    Tables\Columns\TextColumn::make('user.name')
-                        ->description(fn ($record) => $record->created_at, 'below'),
-                    Tables\Columns\TextColumn::make('body')
-                        ->label('')
-                        ->wrap()
-                        ->formatStateUsing(fn (string $state): string => str($state)->markdown())
-                        ->html()
-                        ->extraAttributes([
-                            'class' => 'prose dark:prose-invert ',
-                        ])
-                        ->columnSpanFull(),
+                    Tables\Columns\Layout\View::make('filament.tables.comment-row'),
                 ]),
 
             ])
@@ -51,8 +52,38 @@ class CommentsRelationManager extends RelationManager
                     ->disableCreateAnother()
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                \Filament\Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('Reply')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('gray')
+                        ->fillForm(fn (Comment $record): array => [
+                            'parent_id' => $record->id,
+                        ])
+                         ->form([
+                                Placeholder::make('')
+                                    ->content(fn ($record) => new \Illuminate\Support\HtmlString("
+                                        <div class='prose dark:prose-invert max-w-none'>
+                                            " . str($record->body)->markdown() . "
+                                        </div>
+                                    ")),
+                                MarkdownEditor::make('body')
+                                    ->required(),
+                            ])
+                            ->action(function (array $data, Comment $record): void {
+                                $task = $this->getOwnerRecord();
+                                $record->replies()->create([
+                                    'body' => $data['body'],
+                                    'task_id' => $task->id, 
+                                    'user_id' => auth()->id(),
+                                ]);
+                            })
+                            ->slideOver()
+                            ->modalWidth(MaxWidth::ExtraLarge),
+                            
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
+
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
