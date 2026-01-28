@@ -15,7 +15,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -108,7 +107,7 @@ class TaskResource extends Resource
     public static function table(Table $table): Table
     {
         $table->modifyQueryUsing(function ($query) {
-            if (auth()->check() && auth()->user()->role !== \App\Enums\UserRole::Admin) {
+            if (auth()->check() && auth()->user()->role !== UserRole::Admin) {
                 $query->where('developer_id', auth()->id());
             }
         });
@@ -130,7 +129,7 @@ class TaskResource extends Resource
 
                 Tables\Columns\TextColumn::make('developer.name')
                     ->label('Assigned to')
-                    ->visible(fn($record)=>auth()->user()->role == UserRole::Admin)
+                    ->visible(fn ($record) => auth()->user()->role == UserRole::Admin)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_date')
                     ->date()
@@ -158,7 +157,7 @@ class TaskResource extends Resource
 
                 SelectFilter::make('severity_id')
                     ->label('Severity')
-                    ->relationship('severity', 'name')
+                    ->relationship('severity', 'name'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -177,18 +176,21 @@ class TaskResource extends Resource
             ->schema([
                 InfolistSection::make('Task Information')
                     // ->columnSpan(8)
-                    ->heading(function($record){
+                    ->heading(function ($record) {
                         return $record->title;
                     })
                     ->schema([
                         Grid::make()->schema([
                             TextEntry::make('status.name')
                                 ->badge()
+                                ->inlineLabel()
                                 ->color('primary'),
                             TextEntry::make('severity.name')
                                 ->badge()
+                                ->inlineLabel()
                                 ->color(fn ($record) => $record->severity->color->value),
                             TextEntry::make('description')
+                                ->label('')
                                 ->formatStateUsing(fn (string $state): string => str($state)->markdown())
                                 ->html()
                                 ->extraAttributes([
@@ -213,7 +215,7 @@ class TaskResource extends Resource
                             ->placeholder('Not finished'),
                     ]),
             ]);
-            // ->columns(12);
+        // ->columns(12);
     }
 
     public static function getRelations(): array
