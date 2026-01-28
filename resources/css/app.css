@@ -2,3 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind variants;
+
+/* Menargetkan elemen spesifik di dalam markdown */
+.fi-prose-custom blockquote {
+    border-left: 4px solid #d1d5db; /* Warna abu-abu */
+    padding-left: 1rem;
+    font-style: italic;
+    color: #6b7280;
+    margin: 1.5rem 0;
+}
+
+.fi-prose-custom code {
+    background-color: #f3f4f6; /* Abu muda */
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    color: #eb5757; /* Warna khas code */
+}
+
+/* Untuk dark mode */
+.dark .fi-prose-custom blockquote {
+    border-left-color: #4b5563;
+    color: #9ca3af;
+}
+
+.dark .fi-prose-custom code {
+    background-color: #1f2937;
+    color: #f87171;
+}
