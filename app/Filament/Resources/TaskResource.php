@@ -14,6 +14,8 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class TaskResource extends Resource
@@ -152,7 +154,10 @@ class TaskResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+
+                SelectFilter::make('severity_id')
+                    ->label('Severity')
+                    ->relationship('severity', 'name')
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
