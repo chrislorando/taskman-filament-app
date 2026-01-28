@@ -49,6 +49,8 @@ class CommentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                    ->slideOver()
+                    ->modalWidth(MaxWidth::ExtraLarge)
                     ->disableCreateAnother()
             ])
             ->actions([
