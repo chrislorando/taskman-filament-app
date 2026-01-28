@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TaskResource\RelationManagers;
 
 use App\Models\Comment;
 use App\Notifications\NewComment;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
@@ -48,6 +49,15 @@ class CommentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                Tables\Actions\Action::make('Test')->action(function(){
+                    $recipient = auth()->user();
+
+                    $recipient->notify(
+                        \Filament\Notifications\Notification::make()
+                            ->title('Saved successfully')
+                            ->toDatabase(),
+                    );
+                }),
                 Tables\Actions\CreateAction::make()
                     ->after(function (array $data, Comment $record) {
                         $task = $record->task;

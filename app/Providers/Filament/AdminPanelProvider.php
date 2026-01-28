@@ -9,6 +9,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Assets\Js;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -31,7 +32,8 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->spa()
-            // ->databaseNotifications()
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('10s')
             ->databaseTransactions()
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('2rem')
@@ -45,6 +47,13 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
+            ->assets([
+                Js::make('my-script', \Illuminate\Support\Facades\Vite::asset('resources/js/app.js')),
+            ])
+            ->renderHook(
+                'panels::body.start',
+                fn () => new \Illuminate\Support\HtmlString("<script>window.uid = '".auth()->id()."';</script>"),
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
