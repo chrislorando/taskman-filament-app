@@ -207,7 +207,8 @@ class TaskResource extends Resource
                     ->schema([
 
                         TextEntry::make('developer.name')
-                            ->label('Assigned to'),
+                            ->label('Assigned to')
+                            ->badge(),
                         TextEntry::make('start_date')
                             ->date(),
                         TextEntry::make('due_date')

@@ -49,15 +49,6 @@ class CommentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\Action::make('Test')->action(function(){
-                    $recipient = auth()->user();
-
-                    $recipient->notify(
-                        \Filament\Notifications\Notification::make()
-                            ->title('Saved successfully')
-                            ->toDatabase(),
-                    );
-                }),
                 Tables\Actions\CreateAction::make()
                     ->after(function (array $data, Comment $record) {
                         $task = $record->task;
