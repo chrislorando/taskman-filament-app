@@ -30,7 +30,7 @@ class TaskSeeder extends Seeder
                 'status_id' => $status->id,
                 'severity_id' => $severities->random()->id,
                 'developer_id' => $developers->random()->id,
-                'created_by' => $allUsers->random()->id,
+                'created_by' => 1,
                 'finish_date' => $finishDate,
             ]);
         }

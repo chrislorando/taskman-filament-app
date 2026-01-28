@@ -92,7 +92,7 @@ class TaskResource extends Resource
                             ->preload()
                             ->native(false)
                             ->required()
-                            ->visible(fn () => auth()->check() && auth()->user()?->role === \App\Enums\UserRole::Admin),
+                            ->visible(fn () => auth()->check() && auth()->user()?->role === UserRole::Admin),
                         Forms\Components\DatePicker::make('start_date')
                             ->disabled($isDeveloper),
                         Forms\Components\DatePicker::make('due_date')
