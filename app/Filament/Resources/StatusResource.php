@@ -6,9 +6,11 @@ use App\Filament\Resources\StatusResource\Pages;
 use App\Models\Status;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Table;
 
 class StatusResource extends Resource
@@ -57,18 +59,28 @@ class StatusResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
-                // ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable(),
-                // ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->modalWidth(MaxWidth::Large),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (DeleteAction $action, Status $record) {
+                        if ($record->tasks()->exists()) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Deletion Failed')
+                                ->body('This status cannot be deleted because it is currently assigned to tasks.')
+                                ->persistent()
+                                ->send();
+
+                            $action->halt();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
