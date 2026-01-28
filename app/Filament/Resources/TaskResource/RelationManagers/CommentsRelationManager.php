@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\TaskResource\RelationManagers;
 
-use App\Mail\NewCommentMail;
 use App\Models\Comment;
+use App\Notifications\NewComment;
 use Filament\Forms;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
@@ -13,7 +13,6 @@ use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Mail;
 
 class CommentsRelationManager extends RelationManager
 {
@@ -65,7 +64,7 @@ class CommentsRelationManager extends RelationManager
                         $recipients = $recipients->unique('id');
 
                         foreach ($recipients as $recipient) {
-                            Mail::to($recipient)->send(new NewCommentMail($record));
+                            $recipient->notify(new NewComment($record));
                         }
                     })
                     ->slideOver()
@@ -116,7 +115,7 @@ class CommentsRelationManager extends RelationManager
                             $recipients = $recipients->unique('id');
 
                             foreach ($recipients as $recipient) {
-                                Mail::to($recipient)->queue(new NewCommentMail($reply));
+                                $recipient->notify(new NewComment($reply));
                             }
                         })
                         ->slideOver()
