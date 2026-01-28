@@ -76,4 +76,9 @@ class CommentPolicy
 
         return $user->role === UserRole::Developer && $comment->user_id === $user->id;
     }
+
+    public function deleteAny(User $user): bool
+    {
+        return $user->role === UserRole::Admin;
+    }
 }

@@ -16,3 +16,9 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+
+Route::get('/mailable/{id}', function ($id) {
+    $comment = App\Models\Comment::find($id);
+
+    return new App\Mail\NewCommentMail($comment);
+});

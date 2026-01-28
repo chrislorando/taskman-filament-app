@@ -1,11 +1,10 @@
 @php
     $record = $getRecord();
-    $level = $record->getLevel(); // Ambil kedalaman level
+    $level = $record->getLevel(); 
 @endphp
 
 <div 
     @class([
-
         'w-full text-left ' 
     ])
     style="margin-left: {{ $level * 2 }}rem; "
