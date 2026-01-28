@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\UserRole;
 use App\Filament\Resources\TaskResource\Pages;
 use App\Filament\Resources\TaskResource\RelationManagers\CommentsRelationManager;
 use App\Models\Task;
@@ -129,7 +130,7 @@ class TaskResource extends Resource
 
                 Tables\Columns\TextColumn::make('developer.name')
                     ->label('Assigned to')
-                    ->numeric()
+                    ->visible(fn($record)=>auth()->user()->role == UserRole::Admin)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_date')
                     ->date()
