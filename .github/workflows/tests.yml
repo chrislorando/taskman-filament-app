@@ -38,8 +38,8 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Build Assets
-        run: composer build
+      - name: Install Node Dependencies
+        run: npm i
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -50,5 +50,8 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
+      - name: Build Assets
+        run: npm run build
+
       - name: Run Tests
-        run: php artisan test --compact
+        run: ./vendor/bin/phpunit
