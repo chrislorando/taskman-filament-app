@@ -8,6 +8,7 @@ use App\Filament\Resources\TaskResource\RelationManagers\CommentsRelationManager
 use App\Models\Status;
 use App\Models\Task;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Grid;
@@ -16,8 +17,12 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class TaskResource extends Resource
 {
@@ -112,6 +117,7 @@ class TaskResource extends Resource
     public static function table(Table $table): Table
     {
         $table->modifyQueryUsing(function ($query) {
+            $query->with(['developer','creator']);
             if (auth()->check() && auth()->user()->role !== UserRole::Admin) {
                 $query->where('developer_id', auth()->id());
             }
@@ -126,17 +132,20 @@ class TaskResource extends Resource
                     })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->searchable(),
+                    ->description(fn($record)=> auth()->user()->role == UserRole::Admin ? "Assigned to: {$record->developer->name}" : "")
+                    ->searchable(query: function ($query, string $search) {
+                        $query->where('title', 'like', "%{$search}%")
+                            ->when(auth()->user()->role == UserRole::Admin, function ($q) use ($search){
+                                $q->orWhereHas('developer', function ($q) use ($search) {
+                                    $q->where('name', 'like', "%{$search}%");
+                                });
+                            });
+                        }),
                 Tables\Columns\TextColumn::make('status.name')
                     ->badge()
                     ->color(function ($record) {
                         return $record->status->color->value;
                     })
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('developer.name')
-                    ->label('Assigned to')
-                    ->visible(fn ($record) => auth()->user()->role == UserRole::Admin)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('due_date')
                     ->date()
@@ -161,7 +170,24 @@ class TaskResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-
+                Filter::make('created_at')
+                ->form([
+                    DatePicker::make('created_from')
+                        ->default(now()),
+                    DatePicker::make('created_until')
+                        ->default(now()),
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
                 SelectFilter::make('severity_id')
                     ->label('Severity')
                     ->relationship('severity', 'name'),
