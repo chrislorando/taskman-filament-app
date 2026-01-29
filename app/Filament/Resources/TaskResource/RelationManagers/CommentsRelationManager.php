@@ -122,7 +122,9 @@ class CommentsRelationManager extends RelationManager
                         ->slideOver()
                         ->modalWidth(MaxWidth::ExtraLarge),
 
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->slideOver()
+                        ->modalWidth(MaxWidth::ExtraLarge),
                     Tables\Actions\DeleteAction::make(),
                 ]),
 
