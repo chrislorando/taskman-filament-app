@@ -17,12 +17,13 @@ class TaskFactory extends Factory
         $status = Status::inRandomOrder()->first() ?? Status::create([
             'name' => fake()->unique()->word(),
             'is_active' => true,
+            'color' => \App\Enums\StatusColor::cases()[array_rand(\App\Enums\StatusColor::cases())],
             'sort_order' => fake()->numberBetween(0, 100),
         ]);
 
         $severity = Severity::inRandomOrder()->first() ?? Severity::create([
             'name' => fake()->unique()->word(),
-            'color' => fake()->hexColor(),
+            'color' => \App\Enums\SeverityColor::cases()[array_rand(\App\Enums\SeverityColor::cases())],
             'sort_order' => fake()->numberBetween(0, 100),
         ]);
 

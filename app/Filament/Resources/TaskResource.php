@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\UserRole;
 use App\Filament\Resources\TaskResource\Pages;
 use App\Filament\Resources\TaskResource\RelationManagers\CommentsRelationManager;
+use App\Models\Status;
 use App\Models\Task;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
@@ -28,9 +29,10 @@ class TaskResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $isDeveloper = auth()->check() && auth()->user()->role === \App\Enums\UserRole::Developer;
+        $isDeveloper = auth()->check() && auth()->user()->role === UserRole::Developer;
 
         return $form
+            ->disabled(fn ($record) => $isDeveloper && $record->status_id == Status::where('name', 'Closed')->first()->id)
             ->schema([
                 Section::make('Task Information')
                     // ->columnSpan(8)
@@ -46,9 +48,10 @@ class TaskResource extends Resource
                             ->required()
                             ->live()
                             ->afterStateUpdated(function (Forms\Set $set, $state) {
-                                $completedStatus = \App\Models\Status::where('name', 'Completed')->first();
+                                $completedStatus = Status::where('name', 'Completed')->first();
+                                $closedStatus = Status::where('name', 'Closed')->first();
 
-                                if ($state == $completedStatus?->id) {
+                                if ($state == $closedStatus?->id || $state == $completedStatus?->id) {
                                     $set('finish_date', now()->toDateString());
                                 } else {
                                     $set('finish_date', null);
@@ -56,11 +59,11 @@ class TaskResource extends Resource
                             })
                             ->options(function () use ($isDeveloper) {
                                 if ($isDeveloper) {
-                                    return \App\Models\Status::whereIn('name', ['In Progress', 'Completed'])
+                                    return Status::whereIn('name', ['In Progress', 'Completed'])
                                         ->pluck('name', 'id');
                                 }
 
-                                return \App\Models\Status::all()->pluck('name', 'id');
+                                return Status::all()->pluck('name', 'id');
                             })
                             ->helperText(function () use ($isDeveloper) {
                                 if ($isDeveloper) {
@@ -68,7 +71,8 @@ class TaskResource extends Resource
                                 }
 
                                 return null;
-                            }),
+                            })
+                            ->in(fn (Forms\Components\Select $component) => array_keys($component->getOptions())),
                         Forms\Components\Select::make('severity_id')
                             ->relationship('severity', 'name')
                             ->native(false)

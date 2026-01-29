@@ -2,12 +2,27 @@
 
 namespace App\Observers;
 
+use App\Models\Status;
 use App\Models\Task;
 use App\Notifications\TaskAssigned;
 use App\Notifications\TaskChangeStatus;
 
 class TaskObserver
 {
+    public function saving(Task $task): void
+    {
+        // Pake load() buat mastiin relasi status ada isinya
+        $statusName = Status::find($task->status_id)?->name;
+
+        if (in_array($statusName, ['Completed', 'Closed'])) {
+            // Kalau statusnya Completed/Closed, dan finish_date masih kosong, kasih tanggal
+            $task->finish_date = $task->finish_date ?? now();
+        } else {
+            // Kalau balik ke status lain, kosongin lagi
+            $task->finish_date = null;
+        }
+    }
+
     /**
      * Handle the Task "creating" event.
      */

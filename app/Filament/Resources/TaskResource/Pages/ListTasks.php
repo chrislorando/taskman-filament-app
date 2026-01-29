@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TaskResource\Pages;
 
+use App\Enums\UserRole;
 use App\Filament\Resources\TaskResource;
 use App\Models\Status;
 use Filament\Actions;
@@ -31,10 +32,12 @@ class ListTasks extends ListRecords
         foreach ($statuses as $status) {
             $tabs[str($status->name)->slug()->toString()] = Tab::make($status->name)
                 ->badge(function () use ($status) {
-                    return \App\Models\Task::where('status_id', $status->id)->where('developer_id', auth()->id())->count();
+                    return \App\Models\Task::when(auth()->user()->role === UserRole::Developer, function (Builder $query) {
+                        $query->where('developer_id', auth()->id());
+                    })->where('status_id', $status->id)->count();
                 })
                 ->badgeColor($status->color->value)
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('status_id', $status->id));
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status_id', $status->id));
         }
 
         return $tabs;
