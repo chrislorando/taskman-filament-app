@@ -41,11 +41,11 @@ jobs:
       - name: Install Node Dependencies
         run: npm i
 
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --no-scripts
+
       - name: Build Assets
         run: npm run build
-
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist
 
       - name: Copy Environment File
         run: cp .env.example .env
