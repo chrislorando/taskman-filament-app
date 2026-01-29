@@ -1,66 +1,215 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TaskMan
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A task management application built with Laravel 10 and Filament 3.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Task Management**: Create, view, edit, and delete tasks with full CRUD operations
+- **Role-Based Access Control**:
+    - **Admin**: Full access to all tasks and user management
+    - **Developer**: Can only view and update their assigned tasks
+- **Status Workflow**: Tasks progress through statuses (Waiting → In Progress → Pending → Completed/Closed)
+- **Severity Levels**: Tasks categorized by severity with color-coded badges
+- **Real-time Validation**: Live form validation with dynamic field updates
+- **Comment System**: Threaded comments on tasks for team collaboration
+- **Database Seeding**: Pre-seeded master data (statuses, severities, users)
+- **Responsive UI**: Mobile-friendly interface built with Tailwind CSS
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend**: Laravel 10 (PHP 8.2)
+- **Admin Panel**: Filament 3
+- **Frontend**: Tailwind CSS 3, Alpine.js (via Livewire 3)
+- **Database**: MySQL with Eloquent ORM
+- **Testing**: PHPUnit 10
+- **Development**: Laravel Herd for local serving
 
-## Learning Laravel
+## Setup
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Prerequisites
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- PHP 8.2+
+- Composer
+- Node.js & NPM
+- Laravel Herd (recommended) or any local PHP server
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Installation
 
-## Laravel Sponsors
+1. **Clone the repository**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+    ```bash
+    git clone <repository-url>
+    cd taskman-filament-app
+    ```
 
-### Premium Partners
+2. **Install dependencies**
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+    ```bash
+    composer install
+    npm install
+    ```
 
-## Contributing
+3. **Environment setup**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-## Code of Conduct
+4. **Database setup**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    **Option A: SQLite (Recommended for local development)**
 
-## Security Vulnerabilities
+    ```bash
+    # Edit .env file
+    DB_CONNECTION=sqlite
+    # DB_DATABASE=database/database.sqlite (already set by default)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    # Create the database file
+    touch database/database.sqlite
 
-## License
+    php artisan migrate
+    php artisan db:seed
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    **Option B: MySQL/PostgreSQL**
+
+    ```bash
+    # Edit .env with your database credentials
+    DB_CONNECTION=mysql
+    DB_DATABASE=taskman
+    DB_USERNAME=your_username
+    DB_PASSWORD=your_password
+
+    php artisan migrate
+    php artisan db:seed
+    ```
+
+5. **Testing Environment (Optional)**
+
+   To keep your development data separate from test data:
+
+   ```bash
+   # Copy .env to .env.testing
+   cp .env .env.testing
+
+   # Edit .env.testing - use SQLite for faster tests
+   DB_CONNECTION=sqlite
+   DB_DATABASE=:memory:
+
+   # Or use separate test database
+   # DB_DATABASE=taskman_testing
+   ```
+
+   With `DB_DATABASE=:memory:`, PHPUnit will use an in-memory SQLite database for tests - no file needed, faster execution.
+
+6. **Email Configuration (Mailtrap)**
+
+    For email testing during development, configure Mailtrap:
+
+    ```bash
+    # Edit .env file - replace with your Mailtrap credentials
+    MAIL_MAILER=smtp
+    MAIL_HOST=sandbox.smtp.mailtrap.io
+    MAIL_PORT=2525
+    MAIL_USERNAME=your_mailtrap_username
+    MAIL_PASSWORD=your_mailtrap_password
+    MAIL_ENCRYPTION=tls
+    MAIL_FROM_ADDRESS="hello@taskman-app.test"
+    MAIL_FROM_NAME="${APP_NAME}"
+    ```
+
+    Get your free Mailtrap account at [https://mailtrap.io](https://mailtrap.io)
+
+7. **Real-time Updates with Reverb (Optional)**
+
+    For real-time task updates and notifications:
+
+    ```bash
+    # Install Reverb
+    composer require laravel/reverb
+
+    # Publish config
+    php artisan reverb:install
+
+    # Edit .env - Reverb configuration
+    REVERB_APP_ID=your_app_id
+    REVERB_APP_KEY=your_app_key
+    REVERB_APP_SECRET=your_app_secret
+    VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
+    VITE_REVERB_HOST="localhost"
+    VITE_REVERB_PORT=8080
+    VITE_REVERB_SCHEME="${REVERB_SCHEME:-http}"
+
+    # Start the Reverb server
+    php artisan reverb:start
+    ```
+
+    Run Reverb in a separate terminal while developing.
+
+8. **Build assets**
+
+    ```bash
+    npm run build
+    ```
+
+9. **Serve the application**
+    - With **Herd**: Automatically available at `https://taskman-app.test`
+    - With **Artisan**: `php artisan serve`
+
+### Running Tests
+
+```bash
+# Run all tests
+php artisan test
+
+# Run specific test file
+php artisan test tests/Feature/TaskVisibilityTest.php
+
+# Run with detailed output
+php artisan test --compact
+```
+
+### Code Formatting
+
+```bash
+# Format code with Laravel Pint
+vendor/bin/pint
+```
+
+## Architecture & Trade-offs
+
+### Database Design
+
+**Decision**: Separate `Status` and `Severity` master tables instead of PHP 8 enums.
+
+**Trade-off**:
+
+- ✅ Easy to manage via database, can store metadata (colors, sort order)
+- ❌ Logic is code-defined anyway (status transitions), requires seeding, slower than enums
+
+**Better Approach**: Use PHP 8 enums with Filament support - no seeding, type-safe, better performance. Only use DB tables for truly dynamic data like tags.
+
+### Comment System Design
+
+**Decision**: Nested/threaded comments with `parent_id` for hierarchical discussions.
+
+**Trade-off**:
+
+- ✅ Supports multi-level discussions in theory (current: reply-to-comment with 1-level nesting)
+- ❌ Overkill for 1-on-1 conversations (admin ↔ developer), adds complexity
+
+**Better Approach**: Flat comments with quote/reply instead of threading. Simpler than nested structure.
+
+### Role-Based Access Control
+
+**Decision**: Simple role-based access - Admin sees all tasks, Developer sees only assigned tasks. Implemented via query filtering in Filament table.
+
+**Trade-off**:
+
+- ✅ Simple for small apps - just 2 fixed roles, matches business logic
+- ❌ Not scalable if roles/permissions grow
+
+**True RBAC is overkill**: Granular permissions (can_create, can_delete) are enterprise-level complexity.
+
+**Alternative**: Separate Admin/Developer panels for cleaner separation (more code duplication).
