@@ -6,15 +6,15 @@ use App\Filament\Resources\TaskResource;
 use App\Models\Comment;
 use App\Models\User;
 use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Filament\Notifications\Notification as FilamentNotification;
 
-class NewComment extends Notification implements ShouldQueue, ShouldBroadcast
+class NewComment extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
@@ -45,7 +45,7 @@ class NewComment extends Notification implements ShouldQueue, ShouldBroadcast
     {
         $task = $this->comment->task;
         $commenter = $this->comment->user;
-        
+
         return FilamentNotification::make()
             ->id('broadcast-notification')
             ->title("New Comment from {$commenter->name}")
@@ -53,9 +53,9 @@ class NewComment extends Notification implements ShouldQueue, ShouldBroadcast
             ->actions([
                 Action::make('view')
                     ->button()
-                    ->markAsRead() 
-                    ->url(fn (): string => TaskResource::getUrl('view', ['record' => $task])),  
-          
+                    ->markAsRead()
+                    ->url(fn (): string => TaskResource::getUrl('view', ['record' => $task])),
+
             ])
             ->info()
             ->persistent()
@@ -74,7 +74,7 @@ class NewComment extends Notification implements ShouldQueue, ShouldBroadcast
             ->actions([
                 Action::make('view')
                     ->button()
-                    ->markAsRead() 
+                    ->markAsRead()
                     ->url(TaskResource::getUrl('view', ['record' => $task])),
             ])
             ->info()
