@@ -38,6 +38,15 @@ class TaskObserver
             $task?->creator->notify(new TaskChangeStatus($task));
         }
 
+        if ($task->isDirty('developer_id')) {
+            $oldDeveloperId = $task->getOriginal('developer_id');
+            $newDeveloperId = $task->developer_id;
+
+            if ($newDeveloperId != $oldDeveloperId) {
+                $task?->developer->notify(new TaskAssigned($task));
+            }
+        }
+
     }
 
     /**
