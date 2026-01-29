@@ -5,13 +5,17 @@ A task management application built with Laravel 10 and Filament 3.
 ## Features
 
 - **Task Management**: Create, view, edit, and delete tasks with full CRUD operations
-- **Role-Based Access Control**:
+- **Role-Based Authorization via Policies**: Centralized access control using Laravel Policies
     - **Admin**: Full access to all tasks and user management
-    - **Developer**: Can only view and update their assigned tasks
+    - **Developer**: Can only view and update their assigned tasks, limited status changes
 - **Status Workflow**: Tasks progress through statuses (Waiting → In Progress → Pending → Completed/Closed)
 - **Severity Levels**: Tasks categorized by severity with color-coded badges
 - **Real-time Validation**: Live form validation with dynamic field updates
 - **Comment System**: Threaded comments on tasks for team collaboration
+- **Multi-Channel Notifications**:
+    - **Database Notifications**: Persistent in-app notifications in Filament panel
+    - **Email Notifications**: Email alerts for task assignments and comments (via Mailtrap in dev)
+    - **Broadcast Notifications**: Real-time push updates via Laravel Reverb (optional)
 - **Database Seeding**: Pre-seeded master data (statuses, severities, users)
 - **Responsive UI**: Mobile-friendly interface built with Tailwind CSS
 
@@ -87,21 +91,21 @@ A task management application built with Laravel 10 and Filament 3.
 
 5. **Testing Environment (Optional)**
 
-   To keep your development data separate from test data:
+    To keep your development data separate from test data:
 
-   ```bash
-   # Copy .env to .env.testing
-   cp .env .env.testing
+    ```bash
+    # Copy .env to .env.testing
+    cp .env .env.testing
 
-   # Edit .env.testing - use SQLite for faster tests
-   DB_CONNECTION=sqlite
-   DB_DATABASE=:memory:
+    # Edit .env.testing - use SQLite for faster tests
+    DB_CONNECTION=sqlite
+    DB_DATABASE=:memory:
 
-   # Or use separate test database
-   # DB_DATABASE=taskman_testing
-   ```
+    # Or use separate test database
+    # DB_DATABASE=taskman_testing
+    ```
 
-   With `DB_DATABASE=:memory:`, PHPUnit will use an in-memory SQLite database for tests - no file needed, faster execution.
+    With `DB_DATABASE=:memory:`, PHPUnit will use an in-memory SQLite database for tests - no file needed, faster execution.
 
 6. **Email Configuration (Mailtrap)**
 
@@ -203,13 +207,15 @@ vendor/bin/pint
 
 ### Role-Based Access Control
 
-**Decision**: Simple role-based access - Admin sees all tasks, Developer sees only assigned tasks. Implemented via query filtering in Filament table.
+**Decision**: Role-based authorization via Laravel Policies - Admin sees all tasks, Developer sees only assigned tasks. Query filtering in Filament + policy checks for actions.
 
 **Trade-off**:
-
 - ✅ Simple for small apps - just 2 fixed roles, matches business logic
+- ✅ Centralized in policies (TaskPolicy, CommentPolicy, etc.)
+- ✅ Works well with Filament's query modification
+- ❌ No granular permissions - just role checking, not "can_create_task"
 - ❌ Not scalable if roles/permissions grow
 
-**True RBAC is overkill**: Granular permissions (can_create, can_delete) are enterprise-level complexity.
+**Not true RBAC**: No granular permissions or permission tables. Policies check roles directly, not permissions assigned to roles.
 
-**Alternative**: Separate Admin/Developer panels for cleaner separation (more code duplication).
+**This is**: Role-based policies - organized, centralized authorization logic without enterprise-level complexity.
