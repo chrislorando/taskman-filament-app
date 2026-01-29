@@ -47,6 +47,15 @@ class TaskResource extends Resource
                             ->native(false)
                             ->required()
                             ->live()
+                            ->options(function () use ($isDeveloper) {
+                                if ($isDeveloper) {
+                                    return Status::where('is_active', true)
+                                        ->whereIn('name', ['In Progress', 'Completed'])
+                                        ->pluck('name', 'id');
+                                }
+
+                                return Status::where('is_active', true)->get()->pluck('name', 'id');
+                            })
                             ->afterStateUpdated(function (Forms\Set $set, $state) {
                                 $completedStatus = Status::where('name', 'Completed')->first();
                                 $closedStatus = Status::where('name', 'Closed')->first();
@@ -56,14 +65,6 @@ class TaskResource extends Resource
                                 } else {
                                     $set('finish_date', null);
                                 }
-                            })
-                            ->options(function () use ($isDeveloper) {
-                                if ($isDeveloper) {
-                                    return Status::whereIn('name', ['In Progress', 'Completed'])
-                                        ->pluck('name', 'id');
-                                }
-
-                                return Status::all()->pluck('name', 'id');
                             })
                             ->helperText(function () use ($isDeveloper) {
                                 if ($isDeveloper) {

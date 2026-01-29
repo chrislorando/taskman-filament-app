@@ -35,7 +35,7 @@ class SeverityResource extends Resource
                     ->default(0),
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->unique(),
+                    ->unique(ignoreRecord: true),
                 Forms\Components\ToggleButtons::make('color')
                     ->options(SeverityColor::class)
                     ->inline(),
