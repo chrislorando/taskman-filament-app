@@ -158,8 +158,20 @@ A task management application built with Laravel 10 and Filament 3.
     ```
 
 9. **Serve the application**
-    - With **Herd**: Automatically available at `https://taskman-app.test`
-    - With **Artisan**: `php artisan serve`
+
+   - With **Herd**: Automatically available at `https://taskman-app.test`
+   - With **Artisan**: `php artisan serve`
+
+10. **Login with Default Users**
+
+    After running `php artisan db:seed`, you can login with these credentials:
+
+    | Role | Name | Email | Password |
+    |------|------|-------|----------|
+    | Admin | Admin | admin@example.com | password |
+    | Developer | Developer 1 | developer1@example.com | password |
+    | Developer | Developer 2 | developer2@example.com | password |
+    | Developer | Developer 3 | developer3@example.com | password |
 
 ### Running Tests
 
