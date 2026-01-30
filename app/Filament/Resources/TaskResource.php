@@ -16,9 +16,11 @@ use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -171,9 +173,10 @@ class TaskResource extends Resource
             ])
             ->filters([
                 Filter::make('created_at')
+                ->columns(2)
+                ->columnSpan(2)
                 ->form([
-                    DatePicker::make('created_from')
-                        ->default(now()),
+                    DatePicker::make('created_from'),
                     DatePicker::make('created_until')
                         ->default(now()),
                 ])
@@ -190,8 +193,12 @@ class TaskResource extends Resource
                     }),
                 SelectFilter::make('severity_id')
                     ->label('Severity')
-                    ->relationship('severity', 'name'),
-            ])
+                    ->relationship('severity', 'name')
+                    ->columnSpan(1),
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->filtersFormWidth(MaxWidth::Large)
+            ->filtersFormColumns(3)
+          
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
