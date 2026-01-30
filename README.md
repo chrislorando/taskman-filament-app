@@ -158,17 +158,16 @@ A task management application built with Laravel 10 and Filament 3.
     ```
 
 9. **Serve the application**
-
-   - With **Herd**: Automatically available at `https://taskman-app.test`
-   - With **Artisan**: `php artisan serve`
+    - With **Herd**: Automatically available at `https://taskman-app.test`
+    - With **Artisan**: `php artisan serve`
 
 10. **Login with Default Users**
 
     After running `php artisan db:seed`, you can login with these credentials:
 
-    | Role | Name | Email | Password |
-    |------|------|-------|----------|
-    | Admin | Admin | admin@example.com | password |
+    | Role      | Name        | Email                  | Password |
+    | --------- | ----------- | ---------------------- | -------- |
+    | Admin     | Admin       | admin@example.com      | password |
     | Developer | Developer 1 | developer1@example.com | password |
     | Developer | Developer 2 | developer2@example.com | password |
     | Developer | Developer 3 | developer3@example.com | password |
@@ -222,6 +221,7 @@ vendor/bin/pint
 **Decision**: Role-based authorization via Laravel Policies - Admin sees all tasks, Developer sees only assigned tasks. Query filtering in Filament + policy checks for actions.
 
 **Trade-off**:
+
 - ✅ Simple for small apps - just 2 fixed roles, matches business logic
 - ✅ Centralized in policies (TaskPolicy, CommentPolicy, etc.)
 - ✅ Works well with Filament's query modification
@@ -231,3 +231,17 @@ vendor/bin/pint
 **Not true RBAC**: No granular permissions or permission tables. Policies check roles directly, not permissions assigned to roles.
 
 **This is**: Role-based policies - organized, centralized authorization logic without enterprise-level complexity.
+
+### Admin Panel: Filament 3
+
+**Decision**: Use Filament 3 for admin panel instead of building custom UI.
+
+**Trade-off**:
+
+- ✅ **Rapid Development**: Pre-built admin panel with table builder, form builder, and CRUD operations - saves weeks of development
+- ✅ **Laravel-Native**: Seamless integration with Eloquent, policies, validation, and notifications
+- ✅ **Consistent UI/UX**: Professional-looking interface out of the box with Tailwind CSS
+- ✅ **Built-in Features**: Notifications, auth, resource management, relationship handling, filtering, sorting
+- ✅ **Less Code**: Declarative configuration instead of writing Blade views, controllers, and JS
+- ❌ **Learning Curve**: Requires learning Filament-specific syntax and patterns (Resources, Relations, Widgets)
+- ❌ **Less Flexibility**: Custom UI/UX beyond Filament's conventions requires extra work
