@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('status_id')->constrained()->onDelete('restrict');
             $table->foreignId('severity_id')->constrained()->onDelete('restrict');
-            $table->foreignId('developer_id')->constrained('users')->onDelete('set null');
+            $table->foreignId('developer_id')->nullable()->constrained('users')->onDelete('set null');
             $table->date('start_date')->nullable();
             $table->date('due_date')->nullable();
             $table->date('finish_date')->nullable();
