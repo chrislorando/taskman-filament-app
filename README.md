@@ -49,7 +49,7 @@ A task management application built with Laravel 10 and Filament 3.
 2. **Install dependencies**
 
     ```bash
-    composer install
+    composer install --no-scripts
     npm install
     ```
 
