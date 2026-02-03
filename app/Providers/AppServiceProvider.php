@@ -25,5 +25,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Comment::observe(CommentObserver::class);
         Task::observe(TaskObserver::class);
+
+        if (config('app.env') === 'prod' || config('app.env') === 'production') {
+            \URL::forceScheme('https');
+        }
     }
 }
